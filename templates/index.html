@@ -6,14 +6,14 @@
 </head>
 <body>
     <h1>New user registration:</h1>
-
-     <label> username:</label>
-     <input> <br><br>
-     <label> password:</label>
-     <input><br><br>
-     <label> confirm password:</label>
-     <input><br><br>
-     <button> submit </button>
+    <form action="http://localhost:5000/sign_up" method="post">
+         <label> username:</label>
+         <input type="text" id="username" ><br>
+         <label type = "password" id = "password"> password:</label>
+         <input><br>
+         <label type = "text" id = "verify_password"> confirm password:</label>
+         <input><br>
+        <button type="submit">submit</button>
      </form>
 
 </body>
