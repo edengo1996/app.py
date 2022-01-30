@@ -1,14 +1,34 @@
-from flask import Flask, render_template
-import requests
+from flask import Flask, render_template, request
 import sqlite3
 
 app = Flask(__name__)
 
 
-
-
 def sign_up():
-    print("OK") # insert data into users table.
+    print("OK")
+    pass_text = request.form['pass']
+    ver_pass_text = request.form['ver_pass']
+    username_text = request.form['nm']
+
+    if pass_text != ver_pass_text:
+        return "passwords do not match"
+    else:
+        print("very OK")
+
+        conn = sqlite3.connect('data.db')
+        curs = conn.cursor()
+        curs.execute("""INSERT INTO TABLE users (id) 
+                        VALUE(1)    
+                            """)
+        curs.execute("""INSERT INTO TABLE users (email) 
+                                VALUE(username_text)    
+                                    """)
+        curs.execute("""INSERT INTO TABLE users (password) 
+                                        VALUE(pass_text)    
+                                            """)
+
+        curs.commit()
+        curs.close()
 
 
 @app.route('/')
