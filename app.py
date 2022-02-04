@@ -40,11 +40,7 @@ def sign_up():
 
     conn = sqlite3.connect('data_base.db')
     curs = conn.cursor()
-    curs.execute('''INSERT INTO users (username) 
-                           VALUES(username_text)    
-                               ''')
-    curs.execute('''INSERT INTO users (password) 
-                            VALUES(pass_text) 
-                               ''')
+    params = (1, username_text, pass_text)
+    curs.execute("INSERT INTO users VALUES ( ?, ?, ?)", params)
     conn.commit()
     conn.close()
