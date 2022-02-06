@@ -13,7 +13,7 @@ def hello_world():
     curs = conn.cursor()
     curs.execute('''CREATE TABLE IF NOT EXISTS users (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Username TEXT NOT NULL,
+                    Username TEXT NOT NULL UNIQUE,
                     Password TEXT NOT NULL
                     )''')
     conn.commit()
@@ -28,23 +28,31 @@ def sign_up_page():
 
 @app.route('/sign_up', methods=['POST'])
 def process_sign_up():
-    sign_up()
-    return "process completed Eden"
+    if sign_up():
+        return "process completed Eden", 201
+    return "failed to create a new user", 401
 
 
 def sign_up():
-    print("OK")
     pass_text = request.form['pass']
     ver_pass_text = request.form['ver_pass']
     username_text = request.form['name']
 
+    if pass_text != ver_pass_text or not check_valid_username(username_text):
+        return False
+    conn = sqlite3.connect('data_base.db')
+    curs = conn.cursor()
+    params = (username_text, pass_text)
+    curs.execute("INSERT INTO users VALUES (NULL, ?, ?)", params)
+    conn.commit()
+    conn.close()
+    return True
 
-    if pass_text == ver_pass_text:
-        conn = sqlite3.connect('data_base.db')
-        curs = conn.cursor()
-        params = (username_text,pass_text)
-        curs.execute("INSERT INTO users VALUES (NULL, ?, ?)", params)
-        conn.commit()
-        conn.close()
-    else:
-        flash(u'Invalid password provided', 'error')
+
+def check_valid_username(str_input):
+    conn = sqlite3.connect('database.db')
+    curs = conn.cursor()
+    if curs.execute("SELECT ALL FROM users WHERE username = str_input ") == 0:
+        return True
+    return False
+
