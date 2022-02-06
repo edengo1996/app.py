@@ -13,20 +13,18 @@
         <button type="submit" id = "button">submit</button>
      </form>
 
-    <script>
-        function verification() {
-            var pass = document.getElementById("password").value
-            var verify_pass = document.getElementById("verify_password").value
-            var button = document.getElementById("button").value
-            button.onclick = function () {
-                if (pass !== verify_pass) {
-                alert("passwords do not match")
-            } else {
-                alert("so far so good")
-            }
-            }
-        }
-    </script>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 </body>
 </html>

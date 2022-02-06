@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 import sqlite3
 
 app = Flask(__name__)
@@ -12,9 +12,9 @@ def hello_world():
     conn = sqlite3.connect('data_base.db')
     curs = conn.cursor()
     curs.execute('''CREATE TABLE IF NOT EXISTS users (
-                    id integer,
-                    username text,
-                    password text
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Username TEXT NOT NULL,
+                    Password TEXT NOT NULL
                     )''')
     conn.commit()
     conn.close()
@@ -38,9 +38,13 @@ def sign_up():
     ver_pass_text = request.form['ver_pass']
     username_text = request.form['name']
 
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    params = (1, username_text, pass_text)
-    curs.execute("INSERT INTO users VALUES ( ?, ?, ?)", params)
-    conn.commit()
-    conn.close()
+
+    if pass_text == ver_pass_text:
+        conn = sqlite3.connect('data_base.db')
+        curs = conn.cursor()
+        params = (username_text,pass_text)
+        curs.execute("INSERT INTO users VALUES (NULL, ?, ?)", params)
+        conn.commit()
+        conn.close()
+    else:
+        flash(u'Invalid password provided', 'error')
