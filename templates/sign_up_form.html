@@ -14,8 +14,16 @@
      </form>
 
     <form action="http://localhost:5000/" method="get">
-        <button type="submit" id = "button">back_To_login_page</button>
+        <button type="submit" id = "button">back_To_index_page</button>
     </form>
+
+    {% with messages = get_flashed_messages() %}
+       {% if messages %}
+          {% for message in messages %}
+             {{ message }}
+          {% endfor %}
+       {% endif %}
+    {% endwith %}
 
 </body>
 </html>
