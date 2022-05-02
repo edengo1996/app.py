@@ -1,8 +1,9 @@
 from flask import Flask, render_template, flash
-import sqlite3
 
+import db_management
 import login_utils
 import signup_utils
+
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -11,17 +12,9 @@ if __name__ == '__main__':
     app.run()
 
 
-@app.route('/') # ADD 'UNIQUE' BEFORE 'USERNAME' IN TABLE CREATION
+@app.route('/')
 def hello_world():
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('''CREATE TABLE IF NOT EXISTS users ( 
-                       Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       Username TEXT NOT NULL UNIQUE,
-                       Password TEXT NOT NULL
-                       )''')
-    conn.commit()
-    conn.close()
+    db_management.create_connection()
     return render_template('index.html')
 
 
@@ -33,9 +26,9 @@ def sign_up_page():
 @app.route('/sign_up', methods=['POST'])
 def sign_up():
     if signup_utils.process_sign_up():
-        flash('flash: user created successfully.', "info")
+        flash('user created successfully.', "info")
         return render_template('sign_up_form.html'), 200
-    flash('flash: This username is already taken, or passwords do not match', "error")
+    flash('This username is already taken, or passwords do not match', 'error')
     return render_template('sign_up_form.html'), 400
 
 
@@ -47,8 +40,8 @@ def return_login_page():
 @app.route('/login', methods=['POST'])
 def process_login():
     if login_utils.login_verification():
-        flash('flash: You were successfully logged in Eden', "info")
+        flash('You were successfully logged in Eden', 'info')
         return render_template('login_form.html'), 200
-    flash('flash: failed to login', "error")
+    flash('failed to login', 'error')
     return render_template('login_form.html'), 401
 

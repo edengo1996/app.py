@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>login page</title>
+    <link rel="stylesheet" href='/static/main.css' />
 </head>
 <body>
   <h1>Users login:</h1>
+
+   {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+   {% endwith %}
+
   <form action="http://localhost:5000/login" method="post">
          username: <input type="text" id="username" name ="name">  <br>
          password: <input type = "password" id = "password" name = "pass"> <br>
@@ -16,13 +24,7 @@
         <button type="submit" id = "button">back_To_index_page</button>
   </form>
 
-    {% with messages = get_flashed_messages() %}
-       {% if messages %}
-          {% for message in messages %}
-             {{ message }}
-          {% endfor %}
-       {% endif %}
-    {% endwith %}
+
 
 
 </body>
