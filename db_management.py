@@ -1,31 +1,52 @@
-import sqlite3
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 
-def new_user_creation(username_text, pass_text):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    params = (username_text, pass_text)
-    curs.execute("INSERT INTO users VALUES (NULL, ?, ?)", params)
-    conn.commit()
-    conn.close()
+engine = create_engine('sqlite:///data_base.db')
+conn = engine.connect()
+Session = sessionmaker(bind=engine)
+session = Session()
+Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    Username = Column(String, nullable=False, unique=True)
+    Password = Column(String, nullable=False, unique=True)
+
+
+def create_connection():
+    Base.metadata.create_all(engine)
+
+
+def check_if_user_exists(str_username, str_pass):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    user_count = session.query(User).filter\
+        (User.Username == str_username and User.Password == str_pass).count()
+    if user_count == 0:
+        return False
     return True
 
 
 def is_username_taken(str_input):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('SELECT * FROM users WHERE Username = ?', (str_input,)).fetchall()
-    if len(curs.fetchall()) == 0:
-        return True
-    return False
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-
-def does_user_exist(str_username, str_pass):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('''SELECT * FROM users WHERE Username = ? AND Password = ?;''',
-                 (str_username, str_pass))
-    if len(curs.fetchall()) == 0:
+    user_count = session.query(User).filter \
+        (User.Username == str_input).count()
+    if user_count > 0:
         return False
     return True
 
+
+def create_new_user(username_text, pass_text):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    new_user = User(Username=username_text, Password=pass_text)
+    session.add(new_user)
+    session.commit()

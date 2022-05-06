@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash
-import sqlite3
 
+import db_management
 import login_utils
 import signup_utils
 
@@ -11,17 +11,9 @@ if __name__ == '__main__':
     app.run()
 
 
-@app.route('/') # ADD 'UNIQUE' BEFORE 'USERNAME' IN TABLE CREATION
+@app.route('/')
 def hello_world():
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('''CREATE TABLE IF NOT EXISTS users ( 
-                       Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                       Username TEXT NOT NULL UNIQUE,
-                       Password TEXT NOT NULL
-                       )''')
-    conn.commit()
-    conn.close()
+    db_management.create_connection()
     return render_template('index.html')
 
 
