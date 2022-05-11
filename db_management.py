@@ -1,12 +1,11 @@
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import configurations
 
-
-engine = create_engine('sqlite:///data_base.db')
+engine = create_engine(configurations.connection_string)
 conn = engine.connect()
 Session = sessionmaker(bind=engine)
-session = Session()
 Base = declarative_base()
 
 
@@ -17,27 +16,32 @@ class User(Base):
     Password = Column(String, nullable=False, unique=True)
 
 
-def create_connection():
+def create_tables():
     Base.metadata.create_all(engine)
 
 
-def check_if_user_exists(str_username, str_pass):
+def create_connection():
+    engine = create_engine('sqlite:///data_base.db')
+    conn = engine.connect()
+    Session = sessionmaker(bind=engine)
+    Base = declarative_base()
+
+
+def check_user_exists(str_username, str_pass):
     Session = sessionmaker(bind=engine)
     session = Session()
 
     user_count = session.query(User).filter\
         (User.Username == str_username and User.Password == str_pass).count()
-    if user_count == 0:
-        return False
-    return True
+    return user_count > 0
 
 
-def is_username_taken(str_input):
+def is_username_taken(username):
     Session = sessionmaker(bind=engine)
     session = Session()
 
     user_count = session.query(User).filter \
-        (User.Username == str_input).count()
+        (User.Username == username).count()
     if user_count > 0:
         return False
     return True
@@ -48,5 +52,10 @@ def create_new_user(username_text, pass_text):
     session = Session()
 
     new_user = User(Username=username_text, Password=pass_text)
-    session.add(new_user)
-    session.commit()
+    try:
+        session.add(new_user)
+        session.commit()
+        return True
+    except: # why except? check all ppssible reasons.
+        return False
+

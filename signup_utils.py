@@ -9,9 +9,9 @@ def process_sign_up():
 
     if pass_text != ver_pass_text or not check_valid_username(username_text):
         return False
-    db_management.create_new_user(username_text, pass_text)
-    return True
+    return db_management.create_new_user(username_text, pass_text)
 
 
 def check_valid_username(str_input):
     return db_management.is_username_taken(str_input)
+
