@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import configurations
+from signup_utils import SignupResults
 
 engine = create_engine(configurations.connection_string)
 conn = engine.connect()
@@ -27,7 +28,7 @@ def create_connection():
     Base = declarative_base()
 
 
-def check_user_exists(str_username, str_pass):
+def check_user_exists(str_username: str, str_pass: str) -> bool:
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -36,7 +37,7 @@ def check_user_exists(str_username, str_pass):
     return user_count > 0
 
 
-def is_username_taken(username):
+def is_username_taken(username: str) -> bool:
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -47,7 +48,7 @@ def is_username_taken(username):
     return True
 
 
-def create_new_user(username_text, pass_text):
+def create_new_user(username_text: str, pass_text: str) -> int:
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -55,7 +56,6 @@ def create_new_user(username_text, pass_text):
     try:
         session.add(new_user)
         session.commit()
-        return True
-    except: # why except? check all ppssible reasons.
-        return False
-
+        return SignupResults.SUCCESSFUL_SIGNUP
+    except:
+        return SignupResults.DB_COMM_ERROR
