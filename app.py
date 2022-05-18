@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, request
 from models.SignupResults import SignupResults
 
 import db_management
@@ -49,7 +49,9 @@ def return_login_page():
 
 @app.route('/login', methods=['POST'])
 def process_login():
-    if login_utils.login_verification():
+    password = request.form['pass']
+    username = request.form['name']
+    if login_utils.login_verification(username, password):
         flash(' You were successfully logged in Eden', category='info')
         return render_template('login_form.html'), 200
     flash(' failed to login', category='error')
