@@ -3,19 +3,19 @@ import db_management
 
 
 def process_sign_up():
-    pass_text = request.form['pass']
-    ver_pass_text = request.form['ver_pass']
-    username_text = request.form['name']
+    password = request.form['pass']
+    verification_password = request.form['ver_pass']
+    username = request.form['name']
 
-    if pass_text != ver_pass_text:
+    if password != verification_password:
         return SignupResults.MISMATCHED_PASSWORD
-    elif not check_valid_username(username_text):
+    elif not check_valid_username(username):
         return SignupResults.INVALID_USERNAME
-    return db_management.create_new_user(username_text, pass_text)
+    return db_management.create_new_user(username, password)
 
 
-def check_valid_username(str_input):
-    return db_management.is_username_taken(str_input)
+def check_valid_username(username):
+    return db_management.is_username_not_taken(username)
 
 
 class SignupResults:

@@ -1,12 +1,14 @@
 from flask import Flask, render_template, flash
+from signup_utils import SignupResults
 
 import db_management
 import login_utils
 import signup_utils
-from signup_utils import SignupResults
+import os
+
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = os.environ.get('flaskLogs_secretKey')
 
 if __name__ == '__main__':
     app.run()
@@ -52,4 +54,3 @@ def process_login():
         return render_template('login_form.html'), 200
     flash(' failed to login', category='error')
     return render_template('login_form.html'), 401
-

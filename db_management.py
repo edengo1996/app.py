@@ -1,56 +1,43 @@
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import configurations
 from signup_utils import SignupResults
+from models.User import User
 
-engine = create_engine(configurations.connection_string)
-conn = engine.connect()
-Session = sessionmaker(bind=engine)
+engine = create_engine(configurations.connection_string, connect_args={'check_same_thread': False})
 Base = declarative_base()
 
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    Username = Column(String, nullable=False, unique=True)
-    Password = Column(String, nullable=False, unique=True)
+def create_connection():
+    return engine.connect()
 
 
 def create_tables():
     Base.metadata.create_all(engine)
 
 
-def create_connection():
-    engine = create_engine('sqlite:///data_base.db')
-    conn = engine.connect()
-    Session = sessionmaker(bind=engine)
-    Base = declarative_base()
+def check_login_parameters(username: str, password: str) -> bool:
+    session_made = sessionmaker(bind=engine)
+    session = session_made()
 
-
-def check_user_exists(str_username: str, str_pass: str) -> bool:
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    user_count = session.query(User).filter\
-        (User.Username == str_username and User.Password == str_pass).count()
+    user_count = session.query(User).filter(
+        User.Username == username and User.Password == password).count()
     return user_count > 0
 
 
-def is_username_taken(username: str) -> bool:
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def is_username_not_taken(username: str) -> bool:
+    session_made = sessionmaker(bind=engine)
+    session = session_made()
 
-    user_count = session.query(User).filter \
-        (User.Username == username).count()
-    if user_count > 0:
-        return False
-    return True
+    user_count = session.query(User).filter(
+        User.Username == username).count()
+    return user_count == 0
 
 
 def create_new_user(username_text: str, pass_text: str) -> int:
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session_made = sessionmaker(bind=engine)
+    session = session_made()
 
     new_user = User(Username=username_text, Password=pass_text)
     try:
