@@ -1,5 +1,6 @@
 from flask import request
 import db_management
+from models.SignupResults import SignupResults
 
 
 def process_sign_up():
@@ -16,10 +17,3 @@ def process_sign_up():
 
 def check_valid_username(username):
     return db_management.is_username_not_taken(username)
-
-
-class SignupResults:
-    MISMATCHED_PASSWORD = 1
-    SUCCESSFUL_SIGNUP = 2
-    INVALID_USERNAME = 3
-    DB_COMM_ERROR = 4

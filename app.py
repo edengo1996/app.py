@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash
-from signup_utils import SignupResults
+from models.SignupResults import SignupResults
 
 import db_management
 import login_utils
