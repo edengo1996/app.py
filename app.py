@@ -37,6 +37,9 @@ def sign_up():
     elif result == SignupResults.DB_COMM_ERROR:
         flash('new user creation failed. try again (DB query failed)', category='error')
         return render_template('sign_up_form.html'), 400
+    elif result == SignupResults.USERNAME_TAKEN:
+        flash('username is taken', category='error')
+        return render_template('sign_up_form.html'), 400
     else:
         flash('Unknown error', category='error')
         return render_template('sign_up_form.html'), 400
@@ -52,7 +55,7 @@ def process_login():
     password = request.form['pass']
     username = request.form['name']
     if login_utils.login_verification(username, password):
-        flash(' You were successfully logged in Eden', category='info')
+        flash(' You were successfully logged in ' + username, category='info')
         return render_template('login_form.html'), 200
     flash(' failed to login', category='error')
     return render_template('login_form.html'), 401

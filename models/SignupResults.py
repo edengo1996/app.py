@@ -1,5 +1,6 @@
 class SignupResults:
     MISMATCHED_PASSWORD = 1
     SUCCESSFUL_SIGNUP = 2
-    INVALID_USERNAME = 3
+    USERNAME_TAKEN = 3
     DB_COMM_ERROR = 4
+
