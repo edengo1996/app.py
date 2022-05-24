@@ -1,22 +1,21 @@
-from flask import Flask, render_template, flash, request
-from models.SignupResults import SignupResults
+from flask import Flask, render_template, request
 
+import views
 import db_management
-import login_utils
-import signup_utils
 import os
 
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('flaskLogs_secretKey')
+db_management.create_tables()
+
 
 if __name__ == '__main__':
     app.run()
 
 
 @app.route('/')
-def hello_world():
-    db_management.create_tables()
+def home_page_bootup():
     return render_template('index.html')
 
 
@@ -27,22 +26,10 @@ def sign_up_page():
 
 @app.route('/sign_up', methods=['POST'])
 def sign_up():
-    result = signup_utils.process_sign_up()
-    if result == SignupResults.MISMATCHED_PASSWORD:
-        flash('passwords do not match', category='error')
-        return render_template('sign_up_form.html'), 400
-    elif result == SignupResults.SUCCESSFUL_SIGNUP:
-        flash('user created successfully', category='info')
-        return render_template('sign_up_form.html'), 200
-    elif result == SignupResults.DB_COMM_ERROR:
-        flash('new user creation failed. try again (DB query failed)', category='error')
-        return render_template('sign_up_form.html'), 400
-    elif result == SignupResults.USERNAME_TAKEN:
-        flash('username is taken', category='error')
-        return render_template('sign_up_form.html'), 400
-    else:
-        flash('Unknown error', category='error')
-        return render_template('sign_up_form.html'), 400
+    password = request.form['pass']
+    verification_password = request.form['ver_pass']
+    username = request.form['name']
+    return views.signup_response(username, password, verification_password)
 
 
 @app.route('/login')
@@ -54,8 +41,4 @@ def return_login_page():
 def process_login():
     password = request.form['pass']
     username = request.form['name']
-    if login_utils.login_verification(username, password):
-        flash(' You were successfully logged in ' + username, category='info')
-        return render_template('login_form.html'), 200
-    flash(' failed to login', category='error')
-    return render_template('login_form.html'), 401
+    return views.login_response(username, password)

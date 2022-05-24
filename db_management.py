@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 import configurations
 from signup_utils import SignupResults
 from models.User import User
 
+
 engine = create_engine(configurations.connection_string, connect_args={'check_same_thread': False})
-Base = declarative_base()
+session_made = sessionmaker(bind=engine)
 
 
 def create_connection():
@@ -14,11 +14,10 @@ def create_connection():
 
 
 def create_tables():
-    Base.metadata.create_all(engine)
+    configurations.Base.metadata.create_all(engine)
 
 
 def check_login_parameters(username: str, password: str) -> bool:
-    session_made = sessionmaker(bind=engine)
     session = session_made()
 
     user_count = session.query(User).filter(
@@ -27,7 +26,6 @@ def check_login_parameters(username: str, password: str) -> bool:
 
 
 def is_username_not_taken(username: str) -> bool:
-    session_made = sessionmaker(bind=engine)
     session = session_made()
 
     user_count = session.query(User).filter(
@@ -36,7 +34,6 @@ def is_username_not_taken(username: str) -> bool:
 
 
 def create_new_user(username: str, password: str) -> int:
-    session_made = sessionmaker(bind=engine)
     session = session_made()
 
     if session.query(User).filter(User.Username == username).count() == 1:

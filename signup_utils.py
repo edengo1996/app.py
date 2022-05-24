@@ -1,13 +1,8 @@
-from flask import request
 import db_management
 from models.SignupResults import SignupResults
 
 
-def process_sign_up() -> int:
-    password = request.form['pass']
-    verification_password = request.form['ver_pass']
-    username = request.form['name']
-
+def process_sign_up(username: str, password: str, verification_password: str) -> int:
     if password != verification_password:
         return SignupResults.MISMATCHED_PASSWORD
     elif not check_valid_username(username):
