@@ -1,31 +1,48 @@
-import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import configurations
+from signup_utils import SignupResults
+from models.User import User
 
 
-def new_user_creation(username_text, pass_text):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    params = (username_text, pass_text)
-    curs.execute("INSERT INTO users VALUES (NULL, ?, ?)", params)
-    conn.commit()
-    conn.close()
-    return True
+engine = create_engine(configurations.connection_string, connect_args={'check_same_thread': False})
+session_made = sessionmaker(bind=engine)
 
 
-def is_username_taken(str_input):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('SELECT * FROM users WHERE Username = ?', (str_input,)).fetchall()
-    if len(curs.fetchall()) == 0:
-        return True
-    return False
+def create_connection():
+    return engine.connect()
 
 
-def does_user_exist(str_username, str_pass):
-    conn = sqlite3.connect('data_base.db')
-    curs = conn.cursor()
-    curs.execute('''SELECT * FROM users WHERE Username = ? AND Password = ?;''',
-                 (str_username, str_pass))
-    if len(curs.fetchall()) == 0:
-        return False
-    return True
+def create_tables():
+    configurations.Base.metadata.create_all(engine)
 
+
+def check_login_parameters(username: str, password: str) -> bool:
+    session = session_made()
+
+    user_count = session.query(User).filter(
+        User.Username == username and User.Password == password).count()
+    return user_count == 1
+
+
+def is_username_not_taken(username: str) -> bool:
+    session = session_made()
+
+    user_count = session.query(User).filter(
+        User.Username == username).count()
+    return user_count == 0
+
+
+def create_new_user(username: str, password: str) -> int:
+    session = session_made()
+
+    if session.query(User).filter(User.Username == username).count() == 1:
+        return SignupResults.USERNAME_TAKEN
+
+    new_user = User(Username=username, Password=password)
+    try:
+        session.add(new_user)
+        session.commit()
+        return SignupResults.SUCCESSFUL_SIGNUP
+    except:
+        return SignupResults.DB_COMM_ERROR
