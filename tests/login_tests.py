@@ -1,5 +1,6 @@
-import db_management
+import pytest
+from db_management import check_login_parameters
 
 
-def login_assert():
-    assert db_management.check_login_parameters("s", "s")
+def test_login():
+    assert check_login_parameters("s", "s")

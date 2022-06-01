@@ -1,5 +1,5 @@
-import db_management
+from db_management import create_new_user
 
 
-def login_assert():
-    assert db_management.create_new_user("eden", "eden") == 2 # if 'eden does not exists
+def test_signup():
+    assert create_new_user("eden", "eden") == 3  # if 'eden' is taken
